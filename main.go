@@ -4,49 +4,43 @@ import (
 	"os"
 	"log"
 	"io"
-	"strings"
-	"github.com/uia-worker/misc/conv"
-)	
+	"bufio"
+	"fmt"
+	//"strconv"
+)
 
 func main() {
-	src, err := os.Open("table.csv")
-	//src, err := os.Open("/home/janisg/minyr/kjevik-temp-celsius-20220318-20230318.csv")
+
+	src := "kjevik-temp-celsius-20220318-20230318.csv"
+	dest := "kjevik-temp-fahr-20220318-20230318.csv"
+
+	sourceFile, err := os.Open(src)
 	if err != nil {
-        	log.Fatal(err)
+		log.Fatal(err)
 	}
-	defer src.Close()
-        log.Println(src)
-        
-	
-	var buffer []byte
-	var linebuf []byte // nil
-	buffer = make([]byte, 1)
-        bytesCount := 0
-	for {
-		_, err := src.Read(buffer)
-		if err != nil && err != io.EOF {
-			log.Fatal(err)
-		}
+	defer sourceFile.Close()
 
-		bytesCount++
-		//log.Printf("%c ", buffer[:n])
-		if buffer[0] == 0x0A {
-	           log.Println(string(linebuf))
-		   // Her
-		   elementArray := strings.Split(string(linebuf), ";")
-		   if len(elementArray) > 3 {
-			 celsius := elementArray[3]
-			 fahr := conv.CelsiusToFahrenheit(celsius)
-		         log.Println(elementArray[3])
-	   	   }
-                   linebuf = nil		   
-		} else {
-                   linebuf = append(linebuf, buffer[0])
-		}	
-		//log.Println(string(linebuf))
-		if err == io.EOF {
-			break
-		}
+	destinationFile, err := os.Create(dest)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer destinationFile.Close()
+
+	_, err = io.Copy(destinationFile, sourceFile)
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	scanner := bufio.NewScanner(os.Stdin)
+        fmt.Println("Type either \"convert\" to make a new file or \"average\" to get the average temperature.")
+        scanner.Scan()
+        input := scanner.Text()
+
+        if (input == "convert" || input == "Convert") {
+                fmt.Println("Test \"convert\" passed.")
+        }else if (input == "average" || input == "Average") {
+                fmt.Println("Test \"average\" passed.")
+        }else {
+                fmt.Println("Please type either \"convert\" or \"average\".")
+        }
 }
