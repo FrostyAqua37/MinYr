@@ -8,6 +8,7 @@ import (
         "fmt"
         "strings"
         "strconv"
+	"reflect"
 
 	"github.com/FrostyAqua37/funtemps/conv"
 )
@@ -15,7 +16,7 @@ import (
 func main() {
 
         src := "kjevik-temp-celsius-20220318-20230318.csv" //Sourcfile is assigned to "src".
-//        dest := "kjevik-temp-fahr-20220318-20230318.csv" //Destinationfile is assigned to "dest".
+  	dest := "kjevik-temp-fahr-20220318-20230318.csv" //Destinationfile is assigned to "dest".
 
 
         sourceFile, err := os.Open(src) //Opens the sourcfile.
@@ -34,11 +35,12 @@ func main() {
         }*/
 
         //Lager filen der innholdet kan kopieres til.
-  /*      destinationFile, err := os.Create(dest)
+        destinationFile, err := os.Create(dest)
         if err != nil {
                 log.Fatal(err)
         }
-        defer destinationFile.Close() */
+        defer destinationFile.Close() 
+
 
         //Makes a new buffered scanner of input called "inputScanner".
         inputScanner := bufio.NewScanner(os.Stdin)
@@ -77,6 +79,9 @@ func main() {
 						fahrenheit = conv.CelsiusToFahrenheit(f)
 
 						fmt.Println(items02[0], items02[1], items02[2], fahrenheit)
+						fahrenheitString := fmt.Sprintf("%2.f", fahrenheit)
+						items02[3] = fahrenheitString
+						destinationFile.Write([]byte(line02))
 					}
 				}else {
 					fmt.Println("Please type either \"Celsius\" or \"Fahrenheit\"")
@@ -91,32 +96,62 @@ func main() {
 			if (input == "Celsius" || input == "celsius" || input =="c" || input == "C") {
 				fileScanner := bufio.NewScanner(sourceFile)
 				fileScanner.Scan()
-				lineCount := 1
+				var lineCount int64 = 1
+				var total int64
 
 				for fileScanner.Scan() {
-//					line := fileScanner.Text()
-	//				items := strings.Split(line, ";")
-
-				/*	c, err := strconv.ParseInt(items[3], 10, 64)
-					if err != nil {
-						log.Fatal(err)
-					} */
+					line := fileScanner.Text()
+					items := strings.Split(line, ";")
 					lineCount++
 
+					c, err := strconv.ParseInt(items[3], 10, 64)
+					if reflect.Kind(c) != reflect.Int {
+					continue
+					}
+
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					total += c
 				}
+
+
+				fmt.Println("Total number of temperatures:", total)
 				fmt.Println("Number of lines in file:", lineCount)
+				fmt.Println("Average temperature(Celsius):", lineCount/total)
 
 
 
 			}else if (input == "Fahrenheit" || input == "fahrenheit" || input == "f" || input == "F") {
 				fileScanner := bufio.NewScanner(sourceFile)
 				fileScanner.Scan()
-				lineCount := 1
+				var lineCount float64 = 1
+				var total float64
+				var fahrenheit float64
 
 				for fileScanner.Scan() {
+					line := fileScanner.Text()
+					items := strings.Split(line, ";")
 					lineCount++
+
+					f, err := strconv.ParseFloat(items[3], 64)
+					fahrenheit = conv.CelsiusToFahrenheit(f)
+					if reflect.Kind(f) != reflect.Int {
+					continue
+					}
+
+					if err != nil {
+						log.Fatal(err)
+					}
+					fmt.Println(fahrenheit)
+					total += f
+
 				}
+
+				fmt.Println("Total number of temperatures:", total)
 				fmt.Println("Number of lines in file:", lineCount)
+				fmt.Println("Average temperature(Fahrenheit):", lineCount/total)
 
 			}else {
 				fmt.Println("Please type either \"Celsius \" or \"Fahrenheit\".")
