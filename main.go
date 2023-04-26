@@ -15,7 +15,7 @@ import (
 
 func main() {
 
-        src := "kjevik-temp-celsius-20220318-20230318.csv" //Sourcfile is assigned to "src".
+        src := "kjevik-temp-celsius-20220318-20230318.csv" //Sourcefile is assigned to "src".
   	dest := "kjevik-temp-fahr-20220318-20230318.csv" //Destinationfile is assigned to "dest".
 
 
@@ -55,33 +55,53 @@ func main() {
 			input02 := inputScanner02.Text() //Takes input from "inputScanner02" and puts it in "input02".
 
 				if (input02 == "Celsius" || input02 == "celsius" || input02 == "c" || input02 == "C") { //Checks if the input is one of the options listed.
-					scanner := bufio.NewScanner(sourceFile) //New scanner to "read" the sourcefile. 
-					for scanner.Scan() { //Loops through the file line by line and prints it out. .
+					scanner := bufio.NewScanner(sourceFile) //New scanner to "read" the sourcefile.
+					var lineCount int 
+
+					for scanner.Scan() { //Loops through the file line by line and prints it out. 
 						line := scanner.Text()
 						items := strings.Split(line, ";") //Divides each line when a ";" appears in the line. 
+						lineCount++
 
-						fmt.Println(items)
+						if lineCount == 16756 {
+							lastLine := "Data er basert p   gyldig data (per 18.03.2023) (CC BY 4.0) fra Meteorologisk institutt (MET);endringen er gjort av Eivind Chen."
+							fmt.Println(lastLine)
+							break
+						}
+						items02 := fmt.Sprint(items)
+						fmt.Println(items02)
 					}
 
 				}else if (input02 == "Fahrenheit" || input02 == "fahrenheit" || input02 == "f" || input02 == "F") { //Checks if the input is one of the options listed. 
 					scanner02 := bufio.NewScanner(sourceFile)
 					scanner02.Scan()
 					var fahrenheit float64
+					var lineCount int 
 
 					for scanner02.Scan() {
 						line02 := scanner02.Text()
 						items02 := strings.Split(line02, ";")
+						lastLine := "Data er basert p   gyldig data (per 18.03.2023) (CC BY 4.0) fra Meteorologisk institutt (MET);endringen er gjort av Eivind Chen."
+						lineCount++
+
+						if lineCount == 16755 {
+							fmt.Println(lastLine)
+							break
+						}
 
 						f, err := strconv.ParseFloat(items02[3], 64)
 						if err != nil {
 							log.Fatal(err)
 						}
+
 						fahrenheit = conv.CelsiusToFahrenheit(f)
 
-						fmt.Println(items02[0], items02[1], items02[2], fahrenheit)
 						fahrenheitString := fmt.Sprintf("%2.f", fahrenheit)
 						items02[3] = fahrenheitString
-						destinationFile.Write([]byte(line02))
+
+
+					//	items := fmt.Sprint(items02)
+					//	destinationFile.Write([]byte(items))
 					}
 				}else {
 					fmt.Println("Please type either \"Celsius\" or \"Fahrenheit\"")
@@ -137,16 +157,17 @@ func main() {
 
 					f, err := strconv.ParseFloat(items[3], 64)
 					fahrenheit = conv.CelsiusToFahrenheit(f)
+
 					if reflect.Kind(f) != reflect.Int {
 					continue
 					}
 
 					if err != nil {
-						log.Fatal(err)
-					}
-					fmt.Println(fahrenheit)
-					total += f
+                                                log.Fatal(err)
+                                        }
+                                        fmt.Println(fahrenheit)
 
+					total += fahrenheit
 				}
 
 				fmt.Println("Total number of temperatures:", total)
@@ -161,4 +182,3 @@ func main() {
                 fmt.Println("Please type either \"convert\" or \"average\".")
         }
 }
-
