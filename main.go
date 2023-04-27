@@ -26,22 +26,6 @@ func main() {
         }
         defer sourceFile.Close() //Command to close the sourcfile last. 
 
-        //Leser innholdet til filen, en linje om gangen og deler linjene mellom 4 ulike deler.
-       	/*scanner := bufio.NewScanner(sourceFile)
-        for scanner.Scan() {
-                line := scanner.Text()
-                items := strings.Split(line, ";")
-
-                fmt.Println(items[3])
-        }*/
-
-        //Lager filen der innholdet kan kopieres til.
-/*        destinationFile, err := os.Create(dest)
-        if err != nil {
-                log.Fatal(err)
-        }
-        defer destinationFile.Close() */
-
         //Makes a new buffered scanner of input called "inputScanner".
         inputScanner := bufio.NewScanner(os.Stdin)
         fmt.Println("Type either \"convert\" to make a new file or \"average\" to get the average temperature.")
@@ -64,7 +48,7 @@ func main() {
 						lineCount++
 
 						if lineCount == 16756 {
-							lastLine := "Data er basert p   gyldig data (per 18.03.2023) (CC BY 4.0) fra Meteorologisk institutt (MET);endringen er gjort av Eivind Chen."
+							lastLine := "Data er basert på gyldig data (per 18.03.2023) (CC BY 4.0) fra Meteorologisk institutt (MET);endringen er gjort av Eivind Chen."
 							fmt.Println(lastLine)
 							break
 						}
@@ -78,7 +62,7 @@ func main() {
 					var fahrenheit float64
 					var lineCount int 
 
-					lastLine := fmt.Sprintln("Data er basert p   gyldig data (per 18.03.2023) (CC BY 4.0) fra Meteorologisk institutt (MET);endringen er gjort av Eivind Chen.")
+					lastLine := fmt.Sprintln("Data er basert på gyldig data (per 18.03.2023) (CC BY 4.0) fra Meteorologisk institutt (MET);endringen er gjort av Eivind Chen.")
 
 					if _, err := os.Stat(dest); err == nil {
 					inputScanner := bufio.NewScanner(os.Stdin)
@@ -94,39 +78,76 @@ func main() {
        							}
 
 								for scanner02.Scan() {
-                                               			line := scanner02.Text()
-                                                		items := strings.Split(line, ";")
-                                                		lineCount++
+                                    line := scanner02.Text()
+                                    items := strings.Split(line, ";")
+                                    lineCount++
 
- 			                                               	if lineCount == 16755 {
-                                                        			break
-                                                			}
+ 			                        if lineCount == 16755 {
+                                        break
+                                    }
 
-                                               				 f, err := strconv.ParseFloat(items[3], 64)
-                                              		 			 if err != nil {
-                                                       					 log.Fatal(err)
-                                                				}
+                                    f, err := strconv.ParseFloat(items[3], 64)
+                                    	if err != nil {
+                                            log.Fatal(err)
+                                        }
 
-				                                                fahrenheit = conv.CelsiusToFahrenheit(f)
+				                    fahrenheit = conv.CelsiusToFahrenheit(f)
 
-				                                                fahrenheitString := fmt.Sprintf("%1.f", fahrenheit)
-                                				                items[3] = fahrenheitString
+				                    fahrenheitString := fmt.Sprintf("%2.f", fahrenheit)
+                                	items[3] = fahrenheitString
 
-				                                                items02 := fmt.Sprintln(items)
-                                				                destinationFile.Write([]byte(items02))
-                                       					 	}
+				                    items02 := fmt.Sprintln(items)
+                                	destinationFile.Write([]byte(items02))
+								}
 
-                                        					if lineCount == 16755 {
-                                               						 destinationFile.Write([]byte(lastLine))
-                                       						}
-                                       					 	fmt.Println("Temperaturverdiene er n   blitt konvertert fra \"celsius\" til \"fahrenheit\".")
-                                       						defer destinationFile.Close()
+                                if lineCount == 16755 {
+                                    destinationFile.Write([]byte(lastLine))
+                                }
+
+                                fmt.Println("The temperature has now been converted from \"Celsius\" to \"Fahrenheit\".")
+                                defer destinationFile.Close()
 
 
 						} else if input == "No" || input == "no" {
-							fmt.Println("File was not made.")
+								fmt.Println("File was not overwritten.")
+						}
+
 					} else if errors.Is(err, os.ErrNotExist) {
-						fmt.Println("File does not exist")
+						
+						destinationFile, err := os.Create(dest)
+							if err != nil {
+               					log.Fatal(err)
+       						}
+					
+						for scanner02.Scan() {
+							line := scanner02.Text()
+							items := strings.Split(line, ";")
+							lineCount++
+
+							if lineCount == 16755 {
+								break
+							}
+
+							f, err := strconv.ParseFloat(items[3], 64)
+								if err != nil {
+									log.Fatal(err)
+								}
+							
+							fahrenheit = conv.CelsiusToFahrenheit(f)
+							
+							fahrenheitString := fmt.Sprintf("%1.f", fahrenheit)
+							items[3] = fahrenheitString
+
+							items02 := fmt.Sprintln(items)
+							destinationFile.Write([]byte(items02))
+						}
+
+						if lineCount == 16755 {
+							destinationFile.Write([]byte(lastLine))
+						}
+
+						fmt.Println("Temperaturverdiene har nå blitt konvertert fra Celsius til Fahrenheit.")
+						defer destinationFile.Close()
 					}
 
 				}else {
@@ -208,5 +229,6 @@ func main() {
         }else {
                 fmt.Println("Please type either \"convert\" or \"average\".")
         }
-}
-}
+	}
+
+
