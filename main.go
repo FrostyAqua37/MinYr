@@ -186,7 +186,7 @@ func main() {
 
 				fmt.Println("All temperature values added together:", total)
 				fmt.Println("Number of lines in file:", lineCount)
-				fmt.Println("Average temperature(Celsius):", lineCount/total)
+				fmt.Println("Average temperature(Celsius):", total/lineCount)
 
 
 
@@ -204,15 +204,14 @@ func main() {
 
 					f, err := strconv.ParseFloat(items[3], 64)
 					fahrenheit = conv.CelsiusToFahrenheit(f)
-					fmt.Println(fahrenheit)
 
 					if reflect.Kind(f) != reflect.Int {
 					continue
 					}
 
 					if err != nil {
-                                                log.Fatal(err)
-                                        }
+                        log.Fatal(err)
+                    }
 //                                        fmt.Println(fahrenheit)
 
 					total += fahrenheit
@@ -220,7 +219,7 @@ func main() {
 
 				fmt.Println("All temperature values added together:", total)
 				fmt.Println("Number of lines in file:", lineCount)
-				fmt.Println("Average temperature(Fahrenheit):", lineCount/total)
+				fmt.Println("Average temperature(Fahrenheit):", total/lineCount)
 
 			}else {
 				fmt.Println("Please type either \"Celsius \" or \"Fahrenheit\".")
